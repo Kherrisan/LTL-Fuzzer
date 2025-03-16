@@ -15,6 +15,10 @@ Build_dir=$3
 
 export AFLGO=$LTLFuzzer/AFLGo
 
+INC=$LTLFuzzer/include
+INST_LIB=$LTLFuzzer/build/src/instrumentation/libinstrumentation.a
+ATM_LIB=$LTLFuzzer/build/src/automata/libautomata.a
+
 cd $Build_dir
 while IFS=":" read -r fileName lineNum event
 do
@@ -31,11 +35,12 @@ do
 
     echo $fileName":"$lineNum >$TMP_DIR/BBtargets.txt
 	
-    export COMPILE_ADDITIONAL=" -targets=$TMP_DIR/BBtargets.txt -outdir=$TMP_DIR -flto -fuse-ld=gold -Wl,-plugin-opt=save-temps"
-	export LINK_ADDITIONAL="-targets=$TMP_DIR/BBtargets.txt -outdir=$TMP_DIR -flto -fuse-ld=gold -Wl,-plugin-opt=save-temps"
+    export COMPILE_ADDITIONAL="-flto -targets=$TMP_DIR/BBtargets.txt -outdir=$TMP_DIR -fuse-ld=gold -Wl,-plugin-opt=save-temps"
+	export LINK_ADDITIONAL="-flto -targets=$TMP_DIR/BBtargets.txt -outdir=$TMP_DIR -fuse-ld=gold -Wl,-plugin-opt=save-temps"
     export CC="$AFLGO/afl-clang-fast $COMPILE_ADDITIONAL"
 	export CXX="$AFLGO/afl-clang-fast++ $LINK_ADDITIONAL"
-    make clean
+	make clean
+
     make
 	echo "-------------------------Compile and Link Done--------------------------"
 
@@ -43,12 +48,15 @@ do
     cat $TMP_DIR/BBcalls.txt | sort | uniq > $TMP_DIR/BBcalls2.txt && mv $TMP_DIR/BBcalls2.txt $TMP_DIR/BBcalls.txt
 	
     $AFLGO/scripts/gen_distance_fast.py $Binary_DIR/examples/telnet-server/ $TMP_DIR telnet-server.minimal-net
-	export COMPILE_ADDITIONAL="-distance=$TMP_DIR/distance.cfg.txt"
-	export LINK_ADDITIONAL="-distance=$TMP_DIR/distance.cfg.txt"
+	export COMPILE_ADDITIONAL="-distance=$TMP_DIR/distance.cfg.txt -I $INC -Wl,--whole-archive $INST_LIB $ATM_LIB -Wl,--no-whole-archive -lrt -lspot -lpthread -lbddx -lstdc++"
+	export LINK_ADDITIONAL="-distance=$TMP_DIR/distance.cfg.txt -I $INC -Wl,--whole-archive $INST_LIB $ATM_LIB -Wl,--no-whole-archive -lrt -lspot -lpthread -lbddx -lstdc++"
 	export CC="$AFLGO/afl-clang-fast $COMPILE_ADDITIONAL"
 	export CXX="$AFLGO/afl-clang-fast++ $LINK_ADDITIONAL"
 	make clean
 	make
+	if [ $? -ne 0 ]; then
+  	  exit 1
+	fi
 
     cd $Build_dir
 done < "$Targets_file"
