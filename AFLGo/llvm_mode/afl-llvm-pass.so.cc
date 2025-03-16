@@ -196,8 +196,8 @@ bool AFLCoverage::runOnModule(Module &M) {
 
     std::ifstream targetsfile(TargetsFile);
     std::string line;
-    while (std::getline(targetsfile, line))
-      targets.push_back(line);
+    while (std::getline(targetsfile, line)) 
+	    targets.push_back(line);
     targetsfile.close();
 
     is_aflgo_preprocessing = true;
@@ -348,7 +348,9 @@ bool AFLCoverage::runOnModule(Module &M) {
 
         for (auto &I : BB) {
           instr::InstrFunc::getDebugLoc(&I, filename, line);
-
+std::size_t found = filename.find_last_of("/\\");
+            if (found != std::string::npos)
+              filename = filename.substr(found + 1);
           /* Don't worry about external libs */
           static const std::string Xlibs("/usr/");
           if (filename.empty() || line == 0 || !filename.compare(0, Xlibs.size(), Xlibs))
@@ -372,9 +374,8 @@ bool AFLCoverage::runOnModule(Module &M) {
                 std::size_t pos = target.find_last_of(":");
                 std::string target_file = target.substr(0, pos);
                 unsigned int target_line = atoi(target.substr(pos + 1).c_str());
-
-                if (!target_file.compare(filename) && target_line == line)
-                  is_target = true;
+                if (!target_file.compare(filename) && target_line == line) {
+                  is_target = true;}
 
               }
             }
