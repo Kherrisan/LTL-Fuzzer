@@ -1,0 +1,13 @@
+diff --git a/Makefile.include b/Makefile.include
+index 67b0ff595..2dff8b93a 100644
+--- a/Makefile.include
++++ b/Makefile.include
+@@ -278,7 +278,7 @@ endif
+ ifndef CUSTOM_RULE_LINK
+ %.$(TARGET): %.co $(PROJECT_OBJECTFILES) $(PROJECT_LIBRARIES) contiki-$(TARGET).a
+ 	$(TRACE_LD)
+-	$(Q)$(LD) $(LDFLAGS) $(TARGET_STARTFILES) ${filter-out %.a,$^} \
++	$(Q)$(CC) $(LDFLAGS) $(TARGET_STARTFILES) ${filter-out %.a,$^} \
+ 	    ${filter %.a,$^} $(TARGET_LIBFILES) -o $@
+ endif
+ 
