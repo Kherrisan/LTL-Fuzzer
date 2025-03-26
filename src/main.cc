@@ -17,7 +17,9 @@ int main(int argc, char* argv[]){
     int flag = std::stoi(argv[1]);
     if(flag){
         //1 for protocols
-        path::PathsStore path_store;
+        shared_memory_object::remove(shmId.c_str());
+        managed_shared_memory segment(open_or_create, shmId.c_str(), size);
+        path::PathsStore path_store(&segment);
         ltlfuzz::LTLFuzzer fuzzer(&path_store);
         fuzzer.init(1);
         fuzzer.fuzz(1); 
