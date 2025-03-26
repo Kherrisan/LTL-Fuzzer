@@ -143,6 +143,9 @@ The paper PDF can be found at [https://arxiv.org/abs/2109.02312](https://arxiv.o
 
 ## Protocol Example
 
+> [!NOTE]
+> After cloning contiki into the experiment folder, please apply the patch in `experiment/testTelnet/ld.patch`. This patch just replaces the linker `$(LD)` with `$(CC)`.
+
 ### Testing Framework Introduction
 
 * The testing framework is the same as testing RERS subjects besides one additional fuzzing dictionary file:
@@ -163,7 +166,7 @@ The paper PDF can be found at [https://arxiv.org/abs/2109.02312](https://arxiv.o
 ```
 * Specifying a LTL property to be checked:
 ```
-  export LTL="!(G((WILLDISABLED)->(X(G((DO)|(DONT))))))"
+  export LTL='!(G((WILLDISABLED)->(X(G((DO)|(DONT))))))'
 ```
 
 ### Starting Instrumentation
