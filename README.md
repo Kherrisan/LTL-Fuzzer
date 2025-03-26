@@ -163,7 +163,7 @@ The paper PDF can be found at [https://arxiv.org/abs/2109.02312](https://arxiv.o
 ```
 * Specifying a LTL property to be checked:
 ```
-  export LTL="!(G((WILL_DISABLED)->(X(G((DO)|(DONT))))))"
+  export LTL="!(G((WILLDISABLED)->(X(G((DO)|(DONT))))))"
 ```
 
 ### Starting Instrumentation
